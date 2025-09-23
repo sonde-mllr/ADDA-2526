@@ -1,13 +1,18 @@
 package EjerciciosTeoria;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import us.lsi.common.LongPair;
+import us.lsi.common.Multiset;
 import us.lsi.common.Pair;
 import us.lsi.math.Math2;
+import us.lsi.streams.Collectors2;
 import us.lsi.streams.Stream2;
 
 public class Tema1 {
@@ -76,5 +81,52 @@ public class Tema1 {
 	// Diferentes entre el mio y el de gpt. En el mio se avanza automáticamente al siguiente posible primo.
 	// El mio es peor porque de base no sabe si es primo o no sino que tiene que hacer la comprobación dentro del rango
 	// Para mejorarlo se podría filtrar el rango antes de recorrerlo para que solo tenga numeros primos
+	
+	
+	// ===================================
+	
+	
+	// DIAPOSITIVA 56 
+	/*Ejemplo: Obtener el número de veces que se repite cada divisor, mayor
+	 que 1, entre los divisores de los números que van de m a n */
+	
+	public static Stream<Long> divisores(Long n){
+		return Stream.iterate(2L,x->x<= Math.sqrt(n),x->x+1).filter(x->n%x==0);
+	}
+	
+	/*Multiset<Long> rr4 = Stream.iterate(m1,x->x<n1,x->x+1)
+			.flatMap(x->divisores(x))
+			.collect(Collectors2.toMultiset()));*/
+	
+	public static Map<Long,Integer> divisoresIterativo(Long m,Long n){
+		
+		// Variables de los bucles for
+		Long aMap;
+		// Acumuladores?
+		Map<Long,Integer> contadorDivisores = new HashMap<>();
+
+		
+		for(aMap=m;aMap<n;aMap=aMap+1L) {
+			for(Long m1 : divisores2(aMap)) {
+				if(!contadorDivisores.containsKey(m1)){
+					contadorDivisores.put(m1, 1);
+				} else {
+					contadorDivisores.put(m1, contadorDivisores.get(m1)+1);
+				}
+			}
+		}
+		return contadorDivisores;	
+	}
+	private static List<Long> divisores2(Long n){
+		Long aLista;
+		List<Long> listaDivisores = new ArrayList<>();
+		for(aLista=2L;aLista<=Math.sqrt(n);aLista=aLista+1L){
+			if(n%aLista == 0) {
+				listaDivisores.add(aLista);
+			}
+		}
+		return listaDivisores;
+
+	}
 	
 }
