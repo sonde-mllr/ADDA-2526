@@ -128,5 +128,19 @@ public class Tema1 {
 		return listaDivisores;
 
 	}
+	// BANDERA HOLANDESA
+	
+	public static Record banderaHolandesa(List<Integer> ls,Integer pivote){
+
+		// Reordenar la lista en función del pivote
+		// Hay que ordenar los bloques, no ordenar todo
+		
+		// Tiene que devolver los valores 
+		
+		return null;
+	}
+	
+	
+	
 	
 }
