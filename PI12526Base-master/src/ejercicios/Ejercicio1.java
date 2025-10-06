@@ -35,37 +35,67 @@ public class Ejercicio1 {
 	}
 	
 	private static EnteroCadena next(EnteroCadena anterior) {
-		return EnteroCadena.of(anterior.a(),anterior.a()%3==0?
+		return EnteroCadena.of(anterior.a()+2,anterior.a()%3==0?
 				anterior.s()+anterior.a().toString():
 				anterior.s().substring(anterior.a()%anterior.s().length()));
 	}
 	
 	public static Map<Integer,List<String>> solucionIterativa(Integer varA, String varB, Integer varC, String varD, Integer varE) {
 		Map<Integer,List<String>> ac = new HashMap<>();
-		EnteroCadena primero = EnteroCadena.of(varA, varB);
-		List<EnteroCadena> aux = new ArrayList<EnteroCadena>();
-		aux.add(primero);
-		Integer i = varA;
-		Integer cont = 0;
-		while(i < varC) {
-			EnteroCadena siguiente = aux.get(cont);
-			String valSiguiente = siguiente.s()+varD;
-			if (valSiguiente.length()<varE) {
-				if(ac.containsKey(valSiguiente.length())) {
-					ac.put(cont, ac.get(valSiguiente.length()).add(valSiguiente));
+		EnteroCadena actual = EnteroCadena.of(varA, varB);
+		String nom;
+		int nomLength;
+		while(actual.a() < varC ) {
+			nom = actual.s() + varD;
+			nomLength = nom.length();
+			if(nomLength < varE) {
+				if (!ac.containsKey(nomLength)){
+					ac.put(nomLength,new ArrayList<String>());
+					ac.get(nomLength).add(nom);
 				} else {
-					ac.put(valSiguiente.length(), new ArrayList<String>().add(valSiguiente));					
+					ac.get(nomLength).add(nom);
 				}
 			}
-			aux.add(next(aux.get(cont)));
-			cont++;
-			i = aux.get(cont).a();
+			actual = next(actual);
 		}
-		for(EnteroCadena e:aux) 
 		return ac;
 	}
 	
+	public static Map<Integer,List<String>> sol(Integer varA, String varB, Integer varC, String varD, Integer varE) {
+		Map<Integer,List<String>> ac = null;
+		EnteroCadena actual = EnteroCadena.of(varA, varB);
+		String nom = "";
+		String nxB;
+		int nomLength = 0;
+		nom = actual.s() + varD;
+		nomLength = nom.length();
+		
+		if(actual.a()%3 == 0) {
+			nxB = actual.s()+actual.a().toString();
+		} else {
+			nxB = actual.s().substring(actual.a()%actual.s().length());
+		}
+		
+		if(actual.a() < varC) {
+			ac = sol(varA+2,nxB,varC,varD,varE);
+			if(nomLength < varE) {
+				if(ac.containsKey(nomLength)) {
+					ac.get(nomLength).add(nom);					
+				} else {
+					ac.put(nomLength, new ArrayList<String>());
+					ac.get(nomLength).add(nom);					
+				}
+			}		
+		// Al ser el caso base asumo que nunca va a entrar aquí de primeras
+		} else {
+			return new HashMap<>();
+		}
+		return ac;
+	}	
+	// Me falta la recursiva final
 	public static Map<Integer,List<String>> solucionRecursivaFinal(Integer varA, String varB, Integer varC, String varD, Integer varE) {
 		return null;
 	}
+
+
 }
