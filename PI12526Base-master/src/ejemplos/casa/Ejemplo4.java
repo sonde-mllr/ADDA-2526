@@ -1,8 +1,5 @@
 package ejemplos.casa;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Ejemplo4 {
 	public static Double potAN_recNoFinal(Double a, Integer n) {
 		Double res = null;
@@ -24,7 +21,7 @@ public class Ejemplo4 {
 	}
 	
 	 // porque me apetece
-	
+	/*
 	public static Double potAN_recFinal(Double a,Integer n) {
 		Double res = null;
 		if(n==1) {
@@ -44,6 +41,6 @@ public class Ejemplo4 {
 		}
 		return res;
 	}
-	
+	*/
 	
 }
