@@ -1,1 +1,47 @@
-s
+// Conj elemento y conj contenedores 
+// De cada contenedor: {tipo, capacidad}
+// De cada elemento: {tipoContenedor, tamaño}
+// Ocupar TOTALMENTE mayor numero contenedores 
+// haciendo uso elementos de los que se dispone
+
+head section
+
+Integer getNumElementos()
+Integer getNumContenedores()
+Integer getTamElemento(Integer i)
+Integer getTamContenedor(Integer j)
+// Elemento getElemento(Integer i)
+// Contenedor getContenedor(Integer j)
+Boolean getPuedeUbicarse(Integer i, Integer j)
+Boolean getNoPuedeUbicarse(Integer i, Integer j)
+
+Integer n = getNumElementos()
+Integer m = getNumContenedores()
+
+
+goal section
+
+	max sum( y[j] , j in 0 .. m )
+
+constraints section
+
+	// Cada elemento solo se puede usar en un contenedor
+	
+	sum(x[i,j] , j in 0 .. m  | getPuedeUbicarse(i,j)) <= 1 , i in 0 .. n
+	
+	// Suma de elementos de un contenedor menor o igual al tamaño del contenedor
+	
+	sum( getTamElemento(i) x[i,j] , i in 0 .. n | getPuedeUbicarse(i,j) ) <= getTamContenedor(j) , j in 0 .. m  
+	
+	// Solo se asignan elementos a contenedores que se vayan a usar
+	
+	x[i,j] - y[j] <= 0 , i in 0 .. n , j in 0 .. m | getPuedeUbicarse(i,j)
+	
+	// Si el contenedor se usa debe estar completamente lleno
+	
+	y[j] = 1 -> sum(getTamElemento(i) x[i,j] , i in 0 .. n | getPuedeUbicarse(i,j)) = getTamContenedor(j), j in 0 .. m  
+	
+
+bin 
+x[i,j], j in 0 .. m , i in 0 .. n 
+y[j] , j in 0 .. m
