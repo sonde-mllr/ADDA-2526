@@ -1,0 +1,35 @@
+head section
+// Incluir los metodos necesarios, entre ellos:
+
+Integer getNumCandidatos()
+Integer getPresupuestoMax()
+Integer getNumCualidades()
+Boolean getTieneCualidad(Integer i, Integer j)
+
+Integer getValoracion(Integer i)
+Double getSueldoMin(Integer i)
+Boolean getSonIncompatibles(Integer i,Integer j)
+
+Integer k = getPresupuestoMax()
+Integer n = getNumCandidatos()
+Integer m = getNumCualidades()
+
+goal section
+
+max sum(getValoracion(i) x[i], i in 0 .. n)
+
+constraints section
+
+// Cada cualidad deseada debe ser cubierta por al menos un candidato contratado
+sum(x[i], i in 0 .. n | getTieneCualidad(i,j)) >= 1, j in 0 .. m
+
+// Suma de los sueldos menor al presupuesto max
+
+sum(getSueldoMin(i) x[i], i in 0 .. n) <= k
+
+// Cada par de candidatos no sean incompatibles
+
+x[i] + x[j] <= 1, i in 0 .. n, j in 0 .. n | getSonIncompatibles(i,j)
+
+bin
+x[i], i in 0 .. n
