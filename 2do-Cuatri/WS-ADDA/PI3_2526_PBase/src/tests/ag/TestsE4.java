@@ -2,19 +2,19 @@ package tests.ag;
 
 import java.util.List;
 
-import ejercicio3.Cromosoma3;
+import ejercicio4.Cromosoma4;
 
 import us.lsi.ag.agchromosomes.AlgoritmoAG;
 import us.lsi.ag.agstopping.StoppingConditionFactory;
 
-public class TestsE3 {
+public class TestsE4 {
 
 	public static void main(String[] args) {
-		AlgoritmoAG.POPULATION_SIZE = 50;  // aumentar si no se obtiene un optimo
+		AlgoritmoAG.POPULATION_SIZE = 500;  // aumentar si no se obtiene un optimo
 		StoppingConditionFactory.NUM_GENERATIONS = 5000000; // aumentar si no se obtiene un optimo
 		
 		List.of(1,2,3).forEach(i -> { // indique los tests a realizar
-			var cr = new Cromosoma3("datos_entrada/ejercicio3/DatosEntrada"+i+".txt");
+			var cr = new Cromosoma4("datos_entrada/ejercicio4/DatosEntrada"+i+".txt");
 			var ag = AlgoritmoAG.of(cr);
 			ag.ejecuta();
 			

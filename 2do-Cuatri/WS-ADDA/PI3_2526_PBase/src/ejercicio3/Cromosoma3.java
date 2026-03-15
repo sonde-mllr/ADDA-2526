@@ -3,9 +3,12 @@ package ejercicio3;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import us.lsi.ag.AuxiliaryAg;
 import us.lsi.ag.RangeIntegerData;
 import us.lsi.ag.agchromosomes.Chromosomes.ChromosomeType;
+import us.lsi.common.Set2;
 
 public class Cromosoma3 implements RangeIntegerData<Solucion3> {
 
@@ -44,74 +47,94 @@ public class Cromosoma3 implements RangeIntegerData<Solucion3> {
      *  
      *  [1,2,3, ... ] -> Elemento 1 no está en contenedor 1 ...
      *  
-     *  Quiero hacerlo para que indique que sí está 
      */
-    @Override
-    /* Con diccionario
-    public Double fitnessFunction(List<Integer> value) {
-     
-    	// Goal 1 si contenedor completamente lleno
-    	// Completamente lleno si suma de los pesos de elementos del contenedor = capacidad contenedor
-    	// Cada elemento maximo 1 contenedor
-    	
-    	double goal = 0.;
-    	double error = 0.;
-    	int contadorMalUbicados = 0;
-    	// Map que asocia contenedor y capacidad
-    	Map<Integer,Integer> capacidades = new HashMap<Integer, Integer>();
-    	for( int i = 0; i < size(); i++) {
-    		// i es el elemento
-    		int contenedor = value.get(i);
-    		// si es 0 no está ubicado
-    		if(contenedor > 0) {
-    			
-    			// Añadir a capacidades
-    			if(capacidades.containsKey(contenedor)) {
-    				int tamTotal = capacidades.get(contenedor) + Datos3.getTamElemento(i);
-    				capacidades.put(contenedor, tamTotal);
-    			} else {
-    				capacidades.put(contenedor, Datos3.getTamElemento(i));
-    			}
-    			// Comprobar si se puede ubicar
-    			if(Datos3.getNoPuedeUbicarse(i, contenedor)) {
-    				contadorMalUbicados += 1;
-    			}
-    		}
-    	}
-    	    	
-    	// Luego del for tengo un map con la capacidad de cada contendor
-    	// si la capacidad es mayor o menor  a la del contenedor se añade error
-    	
-    	for( Integer contenedor : capacidades.keySet()) {
-    		// añade más o menos error dependiendo de la diferencia
-    		//error +=  * Math.abs((Datos3.getTamContenedor(contenedor) - capacidades.get(contenedor)));
-    		// El if añadiría error solo si se cumple la condicion
-    		
-    		Integer tamMaxContenedor = Datos3.getTamContenedor(contenedor);
-    		Integer tamOcupadoContenedor = capacidades.get(contenedor);
-    		
-    		if(tamMaxContenedor == tamOcupadoContenedor) {
-    			goal += 1;
-    		} else {
-    			error += Math.abs(tamMaxContenedor - tamOcupadoContenedor);
-    		}
-    	}
-    	
-        return goal -   error * contadorMalUbicados;
-    }*/
     
+    @Override
     public Double fitnessFunction(List<Integer> value) {
-    	double goal = 0.;
-    	double error = 0.;
-    	int malUbicado = 0;
-    	
-    	for(int i = 0; i < max(i) ; i++) {
-    		contenedor = value.get(i);
-    	}
-    	
-    	return goal - malUbicado;
+    	int goal = goal(value);
+    	Double totalIncompatibilidad = totalIncompatibilidad(value);
+    	Double totalTamaño = totalTamaño(value);
+    	return goal - 10000*(totalIncompatibilidad+totalTamaño);
     }
-
+    
+    private Integer goal(List<Integer> value) {
+    	return Set.of(value.stream().filter(c->c<Datos3.getNumContenedores()).toList()).size();
+    }
+    
+    private Double totalIncompatibilidad(List<Integer> value) {
+    	Double cont = 0.;
+    	for(int i=0; i<value.size(); i++) {
+    		if(value.get(i)!=Datos3.getNumContenedores() && Datos3.getNoPuedeUbicarse(i, value.get(i))) {
+    			cont++;
+    		}
+    	}
+    	return AuxiliaryAg.distanceToEqZero(cont);
+   		}
+    
+    private Double totalTamaño(List<Integer> value) {
+    	
+    	Map<Integer, Double> map = new HashMap<>();
+    	for(int i=0; i<value.size(); i++) {
+    		if(!map.containsKey(value.get(i))) {
+    			map.put(value.get(i), 0.);
+    		}
+    		double suma=map.get(value.get(i));
+    		suma+=Datos3.getTamElemento(i);
+    		map.put(value.get(i), suma);
+    	}
+    	double cont = 0;
+    	for(int j=0; j<Datos3.getNumContenedores();j++) {
+    		if(map.containsKey(j)) {
+    			cont+= AuxiliaryAg.distanceToEqZero(map.get(j)- Datos3.getTamContenedor(j));
+    		}
+    	}
+    	return cont;
+    }
+    	
+    
+    public Double ff(List<Integer> value) {
+    	double goal = 0.; // +1 por cada contenedor completamente lleno
+    	double error = 0.;
+    	// el cromosoma es mejor por cada contenedor lleno
+    	// 2 Opciones 
+    		// -> un conetendor solo es valido si contiene elementos compatibles
+    		// -> un contenedor es menos valido si contiene elementos no compatibles
+    	// Solo se usan elementos si están asignados a un contenedor en uso
+    	
+    	/*
+    	// Recorro todos los elementos
+    	for (int i = 0; i < size() ; i++) {
+    		// i es el elemento
+    		// value.get(i) es el contenedor asignado
+    		Datos3.getTamElemento();
+    		
+    	}*/
+    	
+    	
+    	// recorro los contenedores?
+    	
+    	for ( int i = 0; i < max(i) ; i ++) {
+    		int cap = 0;
+    		// j cada elemento del cromosoma
+    		for( int j = 0; j < size() ; j++) {
+    			int contenedor = value.get(j);
+    			// Si puede ubicarse en el contenedor la capacidad del contenedor aumenta
+    			// Si no (disminuye)
+    			if ( i == contenedor && Datos3.getPuedeUbicarse(j, contenedor)) {
+    				cap += Datos3.getTamElemento(i);
+    			} else if(i == contenedor && Datos3.getNoPuedeUbicarse(j, contenedor)) {
+    				cap -= Datos3.getTamElemento(i);
+    			}
+    		
+    		}
+    		if (cap == Datos3.getTamContenedor(i)) {
+    			goal +=1;
+    		} else {
+    			error += cap*100;
+    		};
+    	}
+    	return goal + error*error;
+    }
     @Override
     public Solucion3 solution(List<Integer> value) {
         return Solucion3.create(value);
@@ -119,7 +142,7 @@ public class Cromosoma3 implements RangeIntegerData<Solucion3> {
 
     @Override
     public Integer max(Integer i) {
-        return Datos3.getNumContenedores() + 1;
+        return Datos3.getNumContenedores()+1;
     }
     @Override
     public Integer min(Integer i) {

@@ -116,6 +116,7 @@ public class Datos4 {
 	// Test de la lectura del fichero
 	public static void main(String[] args) throws IOException {
 		iniDatos("datos_entrada/ejercicio4/DatosEntrada1.txt", true);
+		//System.out.println(tiempo(0,1));
 		iniDatos("datos_entrada/ejercicio4/DatosEntrada2.txt", true);
 		iniDatos("datos_entrada/ejercicio4/DatosEntrada3.txt", true);
 	}
