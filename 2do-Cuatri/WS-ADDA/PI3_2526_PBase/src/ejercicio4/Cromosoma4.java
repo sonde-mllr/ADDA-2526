@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+import us.lsi.ag.AuxiliaryAg;
 import us.lsi.ag.RangeIntegerData;
 import us.lsi.ag.agchromosomes.Chromosomes.ChromosomeType;
 
@@ -33,7 +33,49 @@ public class Cromosoma4 implements RangeIntegerData<Solucion4> {
 	
 	
 	@Override
+	
 	public Double fitnessFunction(List<Integer> value) {
+		Double goal = goal(value);
+		Double totalDuracion = totalDuracion(value);
+		Double totalConsecutivos = totalConsecutivos(value);
+		return goal -
+		10000*(AuxiliaryAg.distanceToLeZero(totalDuracion-Datos4.maxTime)+AuxiliaryAg.distanceToGeZero(totalConsecutivos-1));
+		}
+	
+	public static Double goal(List<Integer> value) {
+		Double esfuerzoTotal = 0.;
+		for (int i=0; i<value.size();i++) {
+		esfuerzoTotal+=Datos4.esfuerzo(value.get(i),
+		value.get((i+1)%Datos4.N));
+		}
+		return esfuerzoTotal;
+		}
+	
+	
+	
+	public static Double totalDuracion(List<Integer> value) {
+		Double duracionTotal=0.;
+		for (int i=0; i<value.size();i++) {
+		duracionTotal+=Datos4.tiempo(value.get(i),
+		value.get((i+1)%Datos4.N));
+		}
+		return duracionTotal;
+		}
+	
+	
+	public static Double totalConsecutivos(List<Integer> value) {
+		Double totalConsecutivos=0.;
+		for (int i=0; i<value.size();i++) {
+		if(Datos4.sonMonumentos(value.get(i),
+		value.get((i+1)%Datos4.N))) {
+		totalConsecutivos++;
+		}
+		}
+		return totalConsecutivos;
+		}
+	
+	
+	public Double ff(List<Integer> value) {
 		double goal = 0.; // Equivale a la suma de esfuerzos 
 		double error = 0.; 
 		// Cada Xi indica la interseccion i-ésima
@@ -75,15 +117,11 @@ public class Cromosoma4 implements RangeIntegerData<Solucion4> {
 			// R2 -> Al menos 2 intersecciones seguidas con monumento
 			int contadorMonumentos = 0;
 			for(Integer intersec1 : orden.keySet()) {
-				for(Integer intersec2 : orden.keySet()) {
-					if(intersec1 != intersec2) {
-						goal += Datos4.esfuerzo(intersec1,intersec2);
-						if(Datos4.sonMonumentos(intersec1, intersec2)) {
+						goal += Datos4.esfuerzo(intersec1,(intersec1+1)%Datos4.N);
+						if(Datos4.sonMonumentos(intersec1,(intersec1+1)%Datos4.N)) {
 							contadorMonumentos +=1;
 						}
 					}
-				}
-			}
 			if(contadorMonumentos == 0) {
 				error += 10000000;
 			}
