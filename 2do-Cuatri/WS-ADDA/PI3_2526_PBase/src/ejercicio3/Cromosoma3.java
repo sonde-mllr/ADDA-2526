@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import us.lsi.ag.AuxiliaryAg;
 import us.lsi.ag.RangeIntegerData;
@@ -49,7 +50,40 @@ public class Cromosoma3 implements RangeIntegerData<Solucion3> {
      *  
      */
     
-    @Override
+    public Double fitnesFunction(List<Integer> value) {
+    	double goal = Set.of(value.stream().filter(c->c<Datos3.getNumContenedores()).toList()).size();
+    	double error = 0.;
+    	double incompatible = 0;
+    	Set<Integer> elementosUbicados = Set2.empty();
+    	
+    	for(int i=0;i < size();i++) {
+    		// Recorro todos los Xi 
+    		// si Xi = {0,1,2} -> Xi está en el contenedor 0,1 o 2
+    		// si Xi = {3} -> Xi no está en ningun contenedor
+    		int contenedor = value.get(i);
+    		if(contenedor != Datos3.getNumContenedores()) {
+    			// Si está ubicado en 0 1 o 2
+    			// Comprobamos si puede estar ubciado
+    			if(Datos3.getPuedeUbicarse(i, contenedor)) {
+    				// Si puede ubicarse lo añadimos a conjunto de elementos ubicados
+    				elementosUbicados.add(i);
+    			} else {
+    				incompatible ++;
+    		}
+    		}
+    	}
+    	// Para los elementos ubicados sumamos aquellos que estén en el mismo contenedor
+    	Map<Integer,List<Integer>> contenedorElementos = elementosUbicados.stream().collect(Collectors.groupingBy(x->value.get(x)));
+    	for(Integer contenedor : contenedorElementos.keySet()) {
+    		double capacidadContenedor = 0;
+    		for(Integer elemento : contenedorElementos.get(contenedor)) {
+    			capacidadContenedor += Datos3.getTamElemento(elemento);
+    		}
+    		error += AuxiliaryAg.distanceToEqZero(Datos3.getTamContenedor(contenedor) - capacidadContenedor);
+    	}
+    	return goal- 100 * (error + AuxiliaryAg.distanceToEqZero(incompatible));
+    }
+    
     public Double fitnessFunction(List<Integer> value) {
     	int goal = goal(value);
     	Double totalIncompatibilidad = totalIncompatibilidad(value);
@@ -142,7 +176,7 @@ public class Cromosoma3 implements RangeIntegerData<Solucion3> {
 
     @Override
     public Integer max(Integer i) {
-        return Datos3.getNumContenedores()+1;
+        return Datos3.getNumContenedores();
     }
     @Override
     public Integer min(Integer i) {
