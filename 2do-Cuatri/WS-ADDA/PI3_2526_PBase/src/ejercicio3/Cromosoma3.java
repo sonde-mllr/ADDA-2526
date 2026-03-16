@@ -50,47 +50,52 @@ public class Cromosoma3 implements RangeIntegerData<Solucion3> {
      *  
      */
     
-    public Double fitnesFunction(List<Integer> value) {
-    	double goal = Set.of(value.stream().filter(c->c<Datos3.getNumContenedores()).toList()).size();
+    public Double fitnessFunction(List<Integer> value) {
+    	double goal = 0.;
     	double error = 0.;
-    	double incompatible = 0;
-    	Set<Integer> elementosUbicados = Set2.empty();
+    	double malUbicado = 0;
     	
-    	for(int i=0;i < size();i++) {
-    		// Recorro todos los Xi 
-    		// si Xi = {0,1,2} -> Xi está en el contenedor 0,1 o 2
-    		// si Xi = {3} -> Xi no está en ningun contenedor
+    	//Set.of(value.stream().filter(c->c<Datos3.getNumContenedores()).toList())
+    	// List<Integer> elementosAsignados = value.stream().filter(c->c<Datos3.getNumContenedores()).toList();
+    	//int nElementosAsignados = elementosAsignados.size();
+    	//System.out.println(value);
+    	//System.out.println(elementosAsignados);
+    	//System.out.println(Datos3.getNumContenedores());
+    	// Calcular carga de cada contenedor
+    	// Para Xi {0,1,2,3} -> Si Xi = 3 Se asignan a ese contenedor (No existe)
+    	
+    	int[] capacidades = new int[Datos3.getNumContenedores()];
+    	for(int i=0;i<size();i++) {
     		int contenedor = value.get(i);
     		if(contenedor != Datos3.getNumContenedores()) {
-    			// Si está ubicado en 0 1 o 2
-    			// Comprobamos si puede estar ubciado
-    			if(Datos3.getPuedeUbicarse(i, contenedor)) {
-    				// Si puede ubicarse lo añadimos a conjunto de elementos ubicados
-    				elementosUbicados.add(i);
-    			} else {
-    				incompatible ++;
-    		}
+    			if(Datos3.getNoPuedeUbicarse(i, contenedor)) {
+    				// Si está ubicado y Está mal ubicado -> error
+    				// Qué error?
+    				// Contador -> Luego AuxiliaryAg.DistancetoEq();
+    				malUbicado +=1;
+    			}
+    			// Sumo al array de capacidades en la posicion del contenedor correspondiente el tamaño del elemento
+    			capacidades[contenedor] += Datos3.getTamElemento(i);
     		}
     	}
-    	// Para los elementos ubicados sumamos aquellos que estén en el mismo contenedor
-    	Map<Integer,List<Integer>> contenedorElementos = elementosUbicados.stream().collect(Collectors.groupingBy(x->value.get(x)));
-    	for(Integer contenedor : contenedorElementos.keySet()) {
-    		double capacidadContenedor = 0;
-    		for(Integer elemento : contenedorElementos.get(contenedor)) {
-    			capacidadContenedor += Datos3.getTamElemento(elemento);
+    	// Comprobar que los contenedores están llenos
+    	for(int j = 0;j<Datos3.getNumContenedores();j++) {
+    		// Contenedor es cada posicion del array
+    		// La primera vez que se recorra es la capacidad acumulada del contenedor 1
+    		// La segunda la del segundo ....
+    		double capContenedor = capacidades[j];
+    		if(capContenedor == Datos3.getTamContenedor(j)) {
+    			goal += 1;
+    		} else {
+    			error += AuxiliaryAg.distanceToEqZero(Datos3.getTamContenedor(j)-capContenedor);
     		}
-    		error += AuxiliaryAg.distanceToEqZero(Datos3.getTamContenedor(contenedor) - capacidadContenedor);
     	}
-    	return goal- 100 * (error + AuxiliaryAg.distanceToEqZero(incompatible));
+    	
+    	double distanciaTotal = error + AuxiliaryAg.distanceToEqZero(malUbicado); // TODO
+
+    	return goal - 1000*distanciaTotal;
     }
-    
-    public Double fitnessFunction(List<Integer> value) {
-    	int goal = goal(value);
-    	Double totalIncompatibilidad = totalIncompatibilidad(value);
-    	Double totalTamaño = totalTamaño(value);
-    	return goal - 10000*(totalIncompatibilidad+totalTamaño);
-    }
-    
+    /*
     private Integer goal(List<Integer> value) {
     	return Set.of(value.stream().filter(c->c<Datos3.getNumContenedores()).toList()).size();
     }
@@ -124,7 +129,7 @@ public class Cromosoma3 implements RangeIntegerData<Solucion3> {
     	}
     	return cont;
     }
-    	
+    	*/
     
     public Double ff(List<Integer> value) {
     	double goal = 0.; // +1 por cada contenedor completamente lleno
@@ -176,7 +181,7 @@ public class Cromosoma3 implements RangeIntegerData<Solucion3> {
 
     @Override
     public Integer max(Integer i) {
-        return Datos3.getNumContenedores();
+        return Datos3.getNumContenedores()+1;
     }
     @Override
     public Integer min(Integer i) {
