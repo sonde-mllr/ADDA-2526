@@ -1,0 +1,45 @@
+package us.lsi.alg.matrices;
+
+import java.util.Locale;
+import java.util.Map;
+
+
+import us.lsi.graphs.alg.PD;
+import us.lsi.graphs.alg.PD.PDType;
+import us.lsi.graphs.alg.PD.Sp;
+import us.lsi.hypergraphs.GraphTree;
+import us.lsi.hypergraphs.SimpleVirtualHyperGraph;
+
+public class TestMatricesPD {
+
+	public static void main(String[] args) {
+		Locale.setDefault(Locale.of("en", "US"));
+		DatosMatrices.leeFichero("ficheros/matrices/matrices.txt");
+		
+		MatrixVertex initial = MatrixVertex.initial();
+		
+		System.out.println(DatosMatrices.matrices);
+		
+		SimpleVirtualHyperGraph<MatrixVertex,MatrixEdge,Integer> graph = 
+				SimpleVirtualHyperGraph.simpleVirtualHyperGraph(initial);
+		
+		PD<MatrixVertex, MatrixEdge, Integer,String> a = PD.dynamicProgrammingSearch(graph,PDType.Min);
+		
+		a.withGraph = true;
+		a.search();
+		
+		Map<MatrixVertex, Sp<Integer, MatrixEdge>> s = a.getSolutionsTree();
+		
+		GraphTree<MatrixVertex,MatrixEdge,Integer,String> tree = 
+				GraphTree.graphTree(initial,s);
+	
+		
+		System.out.println(tree.solution());
+		
+		a.toDot("ficheros/matricesPDGraph.gv",
+				v->String.format("(%d,%d)",v.i(),v.j()),
+				e->e.action().toString(),
+				tree.vertices());
+	}
+
+}
